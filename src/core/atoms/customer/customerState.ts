@@ -6,9 +6,12 @@ export const CustomerState = atom({
         // isLoading: false,
         // uri: '',
         data: {
+            id: 0,
             name: "",
             level: 0,
-            coins: "",
+            address: "",
+            phone: "",
+            cccd: "",
         }
     },
 });

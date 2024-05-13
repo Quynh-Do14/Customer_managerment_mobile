@@ -1,4 +1,23 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "../../core/common/constant";
+
+export const validateFields = (isImplicitChange: boolean, key: any, isCheck: boolean, setError: Function, error: any, message: string) => {
+    if (isImplicitChange) {
+        error[key] = {
+            isError: isCheck,
+            message: message,
+        };
+    }
+    else {
+        setError({
+            ...error,
+            [key]: {
+                isError: isCheck,
+                message: message,
+            }
+        });
+    }
+};
 
 export const convertTime = (date: any) => {
     const hours = date.getHours().toString().padStart(2, '0');
@@ -34,4 +53,14 @@ export const StatusConfig = (status: number) => {
         return result
     }
 
+}
+export const translationData = async (vi: string, en: string) => {
+    const storegrage = await AsyncStorage.getItem("language");
+    if (storegrage === "vi") {
+        return vi;
+    };
+    if (storegrage === "en") {
+        return en;
+    };
+    return vi;
 }

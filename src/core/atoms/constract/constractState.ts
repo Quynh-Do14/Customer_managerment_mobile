@@ -6,12 +6,12 @@ export const ConstractState = atom({
         // isLoading: false,
         // uri: '',
         data: {
+            id: 0,
             name: "",
             customer: "",
             date: "",
-            level: "",
             price: "",
-            status: 0
+            policy: ""
         }
     },
 });

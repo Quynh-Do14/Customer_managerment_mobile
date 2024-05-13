@@ -1,8 +1,13 @@
-import React from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect } from 'react'
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { constract, customer } from '../../../core/common/data';
 
 const MainLayout = ({ onGoBack, isBackButton = false, title, logout = false, ...props }: any) => {
-
+    // useEffect(() => {
+    //     AsyncStorage.setItem("customer", JSON.stringify(customer))
+    //     AsyncStorage.setItem("constract", JSON.stringify(constract))
+    // }, [customer, constract])
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -45,7 +50,7 @@ export default MainLayout
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor:"#FFFFFF",
+        backgroundColor: "#FFFFFF",
         paddingVertical: 20,
         flex: 1,
         display: "flex",

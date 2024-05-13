@@ -2,39 +2,16 @@ import { useState } from 'react';
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, ScrollView, Pressable } from 'react-native';
 import DialogNotificationCommon from '../../infrastructure/common/components/dialog/dialogNotification';
 import { account } from '../../core/common/data';
+import Constants from '../../core/common/constant';
+import LoginTab from './login';
+import RegisterTab from './register';
 
-const LoginScreen = ({ navigation }: any) => {
-    const [username, setUsername] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
-    const [showPassword, setShowPassword] = useState<boolean>(true);
-    const [isDialogNoti, setIsDialogNoti] = useState<boolean>(false);
-    const [focusUsername, setFocusUsername] = useState<boolean>(false);
-    const [focusPassword, setFocusPassword] = useState<boolean>(false);
+const LoginScreen = () => {
+    const [tabSelect, setTabSelect] = useState(1)
 
-    const onCloseDialogNoti = () => {
-        setIsDialogNoti(false)
+    const onChangeTab = (value: number) => {
+        setTabSelect(value)
     }
-    const onLoginAsync = async () => {
-        if (username && password) {
-            account.map((it) => {
-                if (it.username == username && it.password == password) {
-                    navigation.navigate(
-                        "Navbar",
-                        {},
-                    );
-                    setUsername("");
-                    setPassword("");
-                }
-                else {
-                    setIsDialogNoti(true)
-                }
-            })
-        }
-    }
-    const toggleShowPassword = () => {
-        setShowPassword(!showPassword);
-    };
-
     return (
         <View style={styles.container}>
             <ScrollView>
@@ -51,96 +28,49 @@ const LoginScreen = ({ navigation }: any) => {
                         style={{ width: 400, height: 180 }}
                     />
                 </View>
-                <View style={[
-                    {
-                        height: '60%',
-                        paddingVertical: 30,
-                        paddingHorizontal: 30,
-                    }
-                ]}>
-                    <View style={[
-                        styles.flexCol,
+                <View
+                    style={[
+                        styles.flexRow,
                         {
-                            gap: 20,
-                            justifyContent: "space-between",
-                            height: "100%"
+                            gap: 30,
+                            paddingHorizontal: 20
                         }
-                    ]}>
-                        <KeyboardAvoidingView>
-                            <View
-                                style={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    gap: 20
-                                }}
-                            >
-                                <Text
-                                    style={styles.label}
-                                >
-                                    Tên đăng nhập
-                                </Text>
-                                <TextInput
-                                    placeholder='Nhập tên đăng nhập'
-                                    placeholderTextColor={"#1e1e1e70"}
-                                    onChangeText={(e) => setUsername(e)}
-                                    value={username}
-                                    style={[
-                                        styles.fontStyle,
-                                        styles.inputStyle,
-                                    ]} />
-                                <View>
-                                    <Text
-                                        style={styles.label}
-                                    >
-                                        Mật khẩu
-                                    </Text>
-                                    <TextInput
-                                        placeholder='Nhập mật khẩu'
-                                        placeholderTextColor={"#1e1e1e70"}
-                                        onChangeText={(e) => setPassword(e)}
-                                        value={password}
-                                        style={[
-                                            styles.fontStyle,
-                                            styles.inputStyle
-                                        ]}
-                                        secureTextEntry={showPassword}
-                                    />
-                                    <Pressable onPress={toggleShowPassword} style={styles.icon}>
-                                        {
-                                            showPassword
-                                                ?
-                                                <Image source={require("../../../assets/images/hide.png")} />
-                                                :
-                                                <Image source={require("../../../assets/images/open.png")} />
-                                        }
-                                    </Pressable>
-                                </View>
-                            </View>
-                        </KeyboardAvoidingView>
+                    ]}
+                >
+                    {Constants.AuthTab.List.map((it, index) => (
                         <TouchableOpacity
-                            style={[
-                                styles.btnStyle
-                            ]}
-                            onPress={onLoginAsync}
+                            key={index}
+                            onPress={() => onChangeTab(it.value)}
+                            style={
+                                tabSelect == it.value
+                                    ?
+                                    styles.activeTab
+                                    :
+                                    null
+                            }
                         >
                             <Text
                                 style={[
                                     styles.fontStyle,
-                                    {
-                                        fontSize: 16,
-                                        color: "#FFFFFF",
-                                    }
+                                    { fontSize: 14 }
                                 ]}
-                            > Đăng nhập
+                            >
+                                {it.label}
                             </Text>
                         </TouchableOpacity>
-                    </View>
+                    ))}
                 </View>
-                <DialogNotificationCommon
-                    visible={isDialogNoti}
-                    onConfirm={onCloseDialogNoti}
-                    message={"Tài khoản đăng nhập không chính xác"}
-                />
+                {
+                    tabSelect == 1
+                        ?
+                        <LoginTab />
+                        :
+                        <RegisterTab
+                            setTabSelect={setTabSelect}
+                        />
+
+                }
+
             </ScrollView>
         </View >
     )

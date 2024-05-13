@@ -1,25 +1,43 @@
-import React, { useEffect, useState } from 'react'
-import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Button, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import MainLayout from '../../infrastructure/common/layouts/layout'
-import { constract } from '../../core/common/data'
 import { LevelConfig, StatusConfig } from '../../infrastructure/helper/helper'
-import { useNavigation } from '@react-navigation/native'
+import { useFocusEffect, useIsFocused, useNavigation } from '@react-navigation/native'
 import { useRecoilState } from 'recoil'
 import { ConstractState } from '../../core/atoms/constract/constractState'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const ConstractManagement = () => {
     const [textSearch, setTextSearch] = useState<string>("");
     const [dataFilter, setDataFilter] = useState<Array<any>>([]);
+    const [data, setData] = useState<Array<any>>([]);
+    
+    const isFocused = useIsFocused();
     const navigation = useNavigation<any>();
     const [, setConstractReducer] = useRecoilState(ConstractState);
+
     const onChangeText = (value: string) => {
         setTextSearch(value)
-        let arrConvert = constract.filter((it: any) => it.name.toLowerCase().includes(value.toLowerCase()))
+        let arrConvert = data.filter((it: any) => it.name.toLowerCase().includes(value.toLowerCase()))
         setDataFilter(arrConvert)
     }
+
+    const getConstractAsync = async () => {
+        const constract = await AsyncStorage.getItem("constract").then((result: any) => {
+            return JSON.parse(result)
+        });
+        setData(constract)
+    }
     useEffect(() => {
-        setDataFilter(constract)
-    }, [constract])
+        getConstractAsync().then(() => { })
+    }, [])
+
+    useEffect(() => {
+        if (data?.length) {
+            setDataFilter(data)
+        }
+    }, [data])
+
 
     const onNavigateDetail = (item: any) => {
         navigation.navigate(
@@ -27,27 +45,55 @@ const ConstractManagement = () => {
             setConstractReducer(
                 {
                     data: {
+                        id: item.id,
                         name: item.name,
                         customer: item.customer,
                         date: item.date,
-                        level: item.level,
                         price: item.price,
-                        status: item.status,
+                        policy: item.policy,
                     }
                 }
             )
         )
     }
+
+    useEffect(() => {
+        if (isFocused) {
+            setTextSearch("");
+            setDataFilter(data);
+            getConstractAsync().then(() => { });
+        }
+    }, [isFocused]);
+
+
     return (
         <MainLayout
             title={"Quản lý hợp đồng"}
         >
+            <View style={[
+                styles.flexCommon,
+                { marginBottom: 8 }
+            ]}>
+                <Text
+                    style={styles.breadcumb}
+                >
+                    Danh sách khách hàng
+                </Text>
 
-            <Text
-                style={styles.breadcumb}
-            >
-                Danh sách hợp đồng
-            </Text>
+                <Pressable style={styles.btn} onPress={() => {
+                    navigation.navigate(
+                        "AddConstract"
+                    )
+                }}>
+                    <Text
+                        style={styles.textBtnStyle}
+                    >
+                        Thêm mới
+                    </Text>
+                </Pressable>
+            </View>
+
+
             <View>
                 <TextInput
                     placeholder='Tìm kiếm tên hợp đồng'
@@ -67,83 +113,98 @@ const ConstractManagement = () => {
                     style={styles.searchIcon}
                 />
             </View>
-
-            <ScrollView>
-                <View style={styles.container}>
-                    {
-                        dataFilter.map((it, index) => {
-                            return (
-                                <Pressable
-                                    onPress={() => onNavigateDetail(it)}
-                                    key={index}
-                                    style={styles.content}
-                                >
-                                    <View>
-                                        <Text
-                                            style={styles.title}
-                                        >{it.name}</Text>
-                                    </View>
-
-                                    <View
-                                        style={styles.flex}
-                                    >
-                                        <Text
-                                            style={styles.label}
-                                        >
-                                            Khách hàng:
-                                        </Text>
-                                        <Text
-                                            style={styles.value}
-                                        >
-                                            {it.customer}
-                                        </Text>
-                                    </View>
-
-                                    <View style={styles.flexCommon}>
-                                        <View
-                                            style={styles.flex}
-                                        >
-                                            <Text
-                                                style={styles.label}
+            {
+                dataFilter && dataFilter.length
+                    ?
+                    <View>
+                        <ScrollView>
+                            <View style={styles.container}>
+                                {
+                                    dataFilter.map((it, index) => {
+                                        return (
+                                            <Pressable
+                                                onPress={() => onNavigateDetail(it)}
+                                                key={index}
+                                                style={styles.content}
                                             >
-                                                Ngày kí:
-                                            </Text>
-                                            <Text
-                                                style={styles.value}
-                                            >
-                                                {it.date}
-                                            </Text>
-                                        </View>
-                                        <View
-                                            style={styles.flex}
-                                        >
-                                            <Text
-                                                style={styles.value}
-                                            >
-                                                {StatusConfig(it.status)}
-                                            </Text>
-                                        </View>
-                                    </View>
-                                    <View
-                                        style={styles.flex}
-                                    >
-                                        <Text
-                                            style={styles.label}
-                                        >
-                                            Giá trị hợp đồng:
-                                        </Text>
-                                        <Text
-                                            style={styles.value}
-                                        >
-                                            {it.price} VNĐ
-                                        </Text>
-                                    </View>
-                                </Pressable>
-                            )
-                        })
-                    }
-                </View>
-            </ScrollView>
+                                                <View>
+                                                    <Text
+                                                        style={styles.title}
+                                                    >{it.name}</Text>
+                                                </View>
+
+                                                <View
+                                                    style={styles.flex}
+                                                >
+                                                    <Text
+                                                        style={styles.label}
+                                                    >
+                                                        Khách hàng:
+                                                    </Text>
+                                                    <Text
+                                                        style={styles.value}
+                                                    >
+                                                        {it.customer}
+                                                    </Text>
+                                                </View>
+
+                                                <View style={styles.flexCommon}>
+                                                    {/* <View
+                                                        style={styles.flex}
+                                                    >
+                                                        <Text
+                                                            style={styles.label}
+                                                        >
+                                                            Ngày kí:
+                                                        </Text>
+                                                        <Text
+                                                            style={styles.value}
+                                                        >
+                                                            {it.date}
+                                                        </Text>
+                                                    </View> */}
+                                                    <View
+                                                        style={styles.flex}
+                                                    >
+                                                        <Text
+                                                            style={styles.value}
+                                                        >
+                                                            {StatusConfig(it.status)}
+                                                        </Text>
+                                                    </View>
+                                                </View>
+                                                <View
+                                                    style={styles.flex}
+                                                >
+                                                    <Text
+                                                        style={styles.label}
+                                                    >
+                                                        Giá trị hợp đồng:
+                                                    </Text>
+                                                    <Text
+                                                        style={styles.value}
+                                                    >
+                                                        {it.price} VNĐ
+                                                    </Text>
+                                                </View>
+                                            </Pressable>
+                                        )
+                                    })
+                                }
+                            </View>
+                        </ScrollView>
+                    </View>
+                    :
+                    <View>
+                        <Text style={[
+                            {
+                                textAlign: "center"
+                            },
+                            styles.fontStyle
+                        ]}>Chưa có hợp đồng</Text>
+                    </View>
+            }
+
         </MainLayout>
     )
 }
@@ -212,5 +273,21 @@ const styles = StyleSheet.create({
         position: "absolute",
         right: 12,
         top: 8,
+    },
+    fontStyle: {
+        color: "#1e1e1e",
+        fontFamily: "Roboto Regular",
+        fontWeight: "900",
+    },
+    textBtnStyle: {
+        fontSize: 16,
+        color: "#FFFFFF",
+        fontFamily: "Roboto Regular",
+        fontWeight: "900",
+    },
+    btn: {
+        backgroundColor: "#3d7bf8",
+        padding: 10,
+        borderRadius: 12,
     },
 })

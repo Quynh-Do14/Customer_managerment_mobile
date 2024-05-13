@@ -14,6 +14,8 @@ import ConstractManagement from './src/screens/constract-management';
 import BottomMenu from './src/infrastructure/common/layouts/bottom-menu';
 import DetailConstract from './src/screens/constract-management/detail';
 import DetailCustomer from './src/screens/customer-management/detail';
+import AddCustomer from './src/screens/customer-management/add';
+import AddConstract from './src/screens/constract-management/add';
 
 const Stack = createNativeStackNavigator();
 const StackNavigator = () => {
@@ -29,7 +31,11 @@ const StackNavigator = () => {
       />
       <Stack.Screen name={"LoginScreen"} component={LoginScreen} />
       <Stack.Screen name={"DetailCustomer"} component={DetailCustomer} />
+      <Stack.Screen name={"AddCustomer"} component={AddCustomer} />
+
       <Stack.Screen name={"DetailConstract"} component={DetailConstract} />
+      <Stack.Screen name={"AddConstract"} component={AddConstract} />
+
     </Stack.Navigator>
   )
 }

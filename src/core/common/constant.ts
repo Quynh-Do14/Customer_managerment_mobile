@@ -1,6 +1,18 @@
 
 
 export default class Constants {
+    static AuthTab = class {
+        static List = [
+            {
+                label: "Đăng nhập",
+                value: 1
+            },
+            {
+                label: "Đăng kí",
+                value: 2
+            },
+        ]
+    }
     static Level = class {
         static List = [
             {
@@ -9,7 +21,7 @@ export default class Constants {
             },
             {
                 value: 2,
-                label: "TIEM NANG"
+                label: "TIEMNANG"
             },
             {
                 value: 3,
